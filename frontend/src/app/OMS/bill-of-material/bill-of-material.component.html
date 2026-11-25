@@ -1,0 +1,158 @@
+<mat-sidenav-container class="bom-layout">
+  <mat-sidenav #drawer position="end" mode="over" class="formula-drawer">
+    <div class="drawer-header">
+      <div>
+        <h2>{{ drawerMode === 'create' ? 'Create Formula' : drawerMode === 'edit' ? 'Edit Formula' : 'Formula Detail' }}</h2>
+        <p *ngIf="selectedFormula" class="muted">{{ selectedFormula.formula_number }}</p>
+      </div>
+      <button mat-icon-button type="button" aria-label="Close drawer" (click)="closeDrawer()">×</button>
+    </div>
+
+    <form [formGroup]="formulaCreate" class="drawer-form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description</mat-label>
+        <input matInput formControlName="description" maxlength="200" />
+        <mat-error *ngIf="formulaCreate.get('description')?.hasError('required')">Description is required</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Remark</mat-label>
+        <textarea matInput formControlName="remark" rows="2"></textarea>
+      </mat-form-field>
+    </form>
+
+    <section class="drawer-section">
+      <div class="section-heading">
+        <h3>Products (Output)</h3>
+        <button *ngIf="drawerMode !== 'detail'" mat-stroked-button color="primary" type="button" (click)="addRow('product')">
+          + Add product
+        </button>
+      </div>
+      <div class="line-items">
+        <div class="line-item line-item-heading">
+          <span>SKU</span><span>Description</span><span>Qty</span><span>UOM</span><span></span>
+        </div>
+        <div class="line-item" *ngFor="let row of newProductList.data; let i = index" [formGroup]="row">
+          <mat-form-field appearance="outline"><input matInput placeholder="SKU" formControlName="sku" /></mat-form-field>
+          <mat-form-field appearance="outline"><input matInput placeholder="Description" formControlName="description" /></mat-form-field>
+          <mat-form-field appearance="outline"><input matInput type="number" min="0.0000001" step="any" placeholder="Qty" formControlName="qty" /></mat-form-field>
+          <mat-form-field appearance="outline"><input matInput placeholder="UOM" formControlName="uom" /></mat-form-field>
+          <button *ngIf="drawerMode !== 'detail'" mat-icon-button color="warn" type="button" aria-label="Remove product" (click)="removeRow('product', i)">×</button>
+        </div>
+        <p class="empty-lines" *ngIf="newProductList.data.length === 0">Add at least one product.</p>
+      </div>
+    </section>
+
+    <section class="drawer-section">
+      <div class="section-heading">
+        <h3>Materials (Input)</h3>
+        <button *ngIf="drawerMode !== 'detail'" mat-stroked-button color="primary" type="button" (click)="addRow('material')">
+          + Add material
+        </button>
+      </div>
+      <div class="line-items">
+        <div class="line-item line-item-heading">
+          <span>SKU</span><span>Description</span><span>Qty</span><span>UOM</span><span></span>
+        </div>
+        <div class="line-item" *ngFor="let row of newMaterialList.data; let i = index" [formGroup]="row">
+          <mat-form-field appearance="outline"><input matInput placeholder="SKU" formControlName="sku" /></mat-form-field>
+          <mat-form-field appearance="outline"><input matInput placeholder="Description" formControlName="description" /></mat-form-field>
+          <mat-form-field appearance="outline"><input matInput type="number" min="0.0000001" step="any" placeholder="Qty" formControlName="qty" /></mat-form-field>
+          <mat-form-field appearance="outline"><input matInput placeholder="UOM" formControlName="uom" /></mat-form-field>
+          <button *ngIf="drawerMode !== 'detail'" mat-icon-button color="warn" type="button" aria-label="Remove material" (click)="removeRow('material', i)">×</button>
+        </div>
+        <p class="empty-lines" *ngIf="newMaterialList.data.length === 0">Add at least one material.</p>
+      </div>
+    </section>
+
+    <div class="drawer-actions">
+      <button mat-button type="button" (click)="closeDrawer()">{{ drawerMode === 'detail' ? 'Close' : 'Cancel' }}</button>
+      <button *ngIf="drawerMode !== 'detail'" mat-raised-button color="primary" type="button" [disabled]="!isFormValid || submitting" (click)="submit()">
+        {{ submitting ? 'Saving...' : drawerMode === 'create' ? 'Save Formula' : 'Update Formula' }}
+      </button>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <main class="page-content">
+      <div class="page-heading">
+        <div>
+          <h1>Bill of Material Formula</h1>
+          <p class="muted">Manage product formulas and their required materials.</p>
+        </div>
+        <button mat-raised-button color="primary" type="button" (click)="openDrawer('create')">+ Create Formula</button>
+      </div>
+
+      <mat-card class="search-card">
+        <form [formGroup]="searchformula" (ngSubmit)="search()" class="search-fields">
+          <mat-form-field appearance="outline">
+            <mat-label>Formula Number</mat-label>
+            <input matInput formControlName="formula_number" placeholder="Search formula number" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Description</mat-label>
+            <input matInput formControlName="description" placeholder="Search description" />
+          </mat-form-field>
+          <div class="search-actions">
+            <button mat-raised-button color="primary" type="submit">Search</button>
+            <button mat-button type="button" (click)="resetSearch()">Reset</button>
+          </div>
+        </form>
+      </mat-card>
+
+      <mat-card class="list-card">
+        <div class="list-heading">
+          <h2>Formula List</h2>
+          <span class="muted" *ngIf="loading">Loading...</span>
+        </div>
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="formulaList" class="formula-table">
+            <ng-container matColumnDef="created_time">
+              <th mat-header-cell *matHeaderCellDef>Time</th>
+              <td mat-cell *matCellDef="let row">{{ row.created_time | date:'dd/MM/yyyy HH:mm' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="formula_number">
+              <th mat-header-cell *matHeaderCellDef>Formula Number</th>
+              <td mat-cell *matCellDef="let row"><strong>{{ row.formula_number }}</strong></td>
+            </ng-container>
+            <ng-container matColumnDef="description">
+              <th mat-header-cell *matHeaderCellDef>Description</th>
+              <td mat-cell *matCellDef="let row">{{ row.description }}</td>
+            </ng-container>
+            <ng-container matColumnDef="remark">
+              <th mat-header-cell *matHeaderCellDef>Remark</th>
+              <td mat-cell *matCellDef="let row">{{ row.remark || '—' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="pic">
+              <th mat-header-cell *matHeaderCellDef>PIC</th>
+              <td mat-cell *matCellDef="let row">{{ row.pic || '—' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef>Action</th>
+              <td mat-cell *matCellDef="let row">
+                <div class="row-actions">
+                  <button mat-button color="primary" type="button" (click)="openDetail(row)">Detail</button>
+                  <button mat-button color="primary" type="button" (click)="openEdit(row)">Edit</button>
+                  <button mat-button color="warn" type="button" (click)="deleteFormula(row)">Delete</button>
+                </div>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+          <div class="empty-state" *ngIf="!loading && formulaList.data.length === 0">
+            No formulas found. Create your first formula to get started.
+          </div>
+        </div>
+
+        <div class="pager">
+          <span class="muted">{{ paginatorFormulaList.total === 0 ? 0 : paginatorFormulaList.skip + 1 }} - {{ pageTo }} of {{ paginatorFormulaList.total }}</span>
+          <div>
+            <button mat-button type="button" (click)="prevPage()" [disabled]="paginatorFormulaList.skip === 0">Previous</button>
+            <button mat-button type="button" (click)="nextPage()" [disabled]="paginatorFormulaList.skip + paginatorFormulaList.limit >= paginatorFormulaList.total">Next</button>
+          </div>
+        </div>
+      </mat-card>
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

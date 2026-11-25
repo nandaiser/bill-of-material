@@ -1,0 +1,70 @@
+.bom-layout {
+  min-height: calc(100vh - 64px);
+  background: #f4f6fa;
+}
+
+.page-content {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 28px;
+}
+
+.page-heading,
+.list-heading,
+.section-heading,
+.drawer-header,
+.pager,
+.search-fields,
+.search-actions,
+.row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.page-heading { margin-bottom: 22px; }
+h1, h2, h3, p { margin-top: 0; }
+h1 { margin-bottom: 6px; font-size: 26px; }
+h2 { margin-bottom: 0; font-size: 19px; }
+h3 { margin-bottom: 0; font-size: 16px; }
+.muted { color: #687386; font-size: 13px; }
+.search-card, .list-card { margin-bottom: 20px; padding: 18px; }
+.search-fields { justify-content: flex-start; flex-wrap: wrap; }
+.search-fields mat-form-field { flex: 1 1 240px; }
+.search-actions { padding-bottom: 18px; }
+.list-heading { margin-bottom: 16px; }
+.table-wrapper { overflow-x: auto; }
+.formula-table { width: 100%; min-width: 850px; }
+.formula-table th { color: #526071; font-weight: 600; white-space: nowrap; }
+.formula-table td, .formula-table th { padding: 12px 10px; }
+.row-actions { justify-content: flex-start; gap: 0; white-space: nowrap; }
+.empty-state { padding: 42px 16px; text-align: center; color: #687386; }
+.pager { padding-top: 16px; border-top: 1px solid #e7eaf0; }
+
+.formula-drawer { width: min(760px, 94vw); padding: 24px; box-sizing: border-box; }
+.drawer-header { margin-bottom: 22px; }
+.drawer-header h2 { margin-bottom: 5px; }
+.drawer-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.full-width { width: 100%; }
+.drawer-section { margin-top: 20px; }
+.section-heading { margin-bottom: 12px; }
+.line-items { overflow-x: auto; }
+.line-item {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 0.7fr 0.7fr 40px;
+  gap: 8px;
+  align-items: center;
+  min-width: 600px;
+}
+.line-item mat-form-field { width: 100%; }
+.line-item-heading { padding: 0 8px 8px; color: #687386; font-size: 12px; font-weight: 600; }
+.empty-lines { color: #687386; font-size: 13px; padding: 10px 0; }
+.drawer-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; padding-top: 18px; border-top: 1px solid #e7eaf0; }
+
+@media (max-width: 700px) {
+  .page-content { padding: 16px; }
+  .page-heading { align-items: flex-start; flex-direction: column; }
+  .drawer-form { grid-template-columns: 1fr; gap: 0; }
+  .formula-drawer { padding: 16px; }
+}

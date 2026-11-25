@@ -1,0 +1,19 @@
+{
+  "name": "bom-test-backend",
+  "version": "1.0.0",
+  "description": "Engineer test case: Bill of Material (formula) backend skeleton",
+  "main": "app.js",
+  "private": true,
+  "scripts": {
+    "start": "node app.local.js",
+    "dev": "nodemon app.local.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongoose": "^8.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
